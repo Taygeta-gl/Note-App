@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Persistent Notes App</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="authModal">
+    <div class="auth-box">
+      <h2>Welcome to NoteApp</h2>
+      <input id="email" type="email" placeholder="Email" />
+      <input id="password" type="password" placeholder="Password" />
+      <div class="auth-buttons">
+        <button onclick="signup()">Sign Up</button>
+        <button onclick="login()">Login</button>
+        <button id="reset" onclick="resetPassword()">Forgot Password?</button>
+      </div>
+      <p id="loginStatus"></p>
+    </div>
+  </div>
+
+  <button id="viewTrashBtn" onclick="viewTrash()">
+    <img src="bin.svg" alt="Trash Bin" style="width: 40px; height: 40px; vertical-align: middle;" />
+  </button>
+
+  <div id="trashOverlay" class="hidden">
+    <button onclick="closeTrash()" style="margin-top: 1em;">Close</button>
+    <div id="trashContainer"></div>
+  </div>
+
+  <h1 id="left-corner-text">Write a Note</h1>
+  <h1 id="right-corner-text">View the Note</h1>
+
+  <div id="textBox">
+    <textarea id="noteInput" type="text" placeholder="Write a note..."></textarea>
+    <button id="addingBtn" onclick="addNote()">Add</button>
+  </div>
+
+  <!-- Full-size note viewer -->
+  <div id="fullNoteViewer" class="hidden">
+    <textarea id="fullNoteContent"></textarea>
+    <button id="saveViewerBtn">Save</button>
+  </div>
+
+  <div id="notesContainer"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAa-rU8HDKYqI_qylVIpLVa_vbH7Ushanc",
+      authDomain: "noteapp-f141c.firebaseapp.com",
+      projectId: "noteapp-f141c",
+      storageBucket: "noteapp-f141c.appspot.com",
+      messagingSenderId: "125264114667",
+      appId: "1:125264114667:web:7f455c5f460cb1b32e9fae",
+      measurementId: "G-0GEYLES3FM"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+    const loginStatus = document.getElementById("loginStatus");
+    const authModal = document.getElementById("authModal");
+
+    function hideAuthModal() {
+      authModal.style.display = "none";
+    }
+
+    window.signup = () => {
+      const email = emailInput.value;
+      const password = passwordInput.value;
+
+      createUserWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          loginStatus.textContent = `✅ Signed up as ${email}. You can now log in.`;
+        })
+        .catch((error) => {
+          loginStatus.textContent = `❌ ${error.message}`;
+        });
+    };
+
+    window.login = () => {
+      const email = emailInput.value;
+      const password = passwordInput.value;
+
+      signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          const user = userCredential.user;
+          loginStatus.textContent = `✅ Logged in as ${email}`;
+          localStorage.setItem("loggedInUser", user.email);
+          hideAuthModal();
+        })
+        .catch((error) => {
+          loginStatus.textContent = `❌ ${error.message}`;
+        });
+    };
+
+    window.resetPassword = () => {
+      alert("If you forgot your password, please contact me at: saadat.universe@gmail.com");
+    };
+  </script>
+
+  <script src="script.js"></script>
+</body>
+</html>
