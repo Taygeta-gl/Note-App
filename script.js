@@ -9,37 +9,57 @@ window.onload = function () {
   savedNotes.forEach(createNoteElement);
 
   document.getElementById("saveViewerBtn").onclick = function () {
-    const newText = document.getElementById("fullNoteContent").value.trim();
-    if (!newText || !currentlyViewedNote) return;
+  const newText = document.getElementById("fullNoteContent").value.trim();
+  if (!newText || !currentlyViewedNote) return;
 
-    // 1. Update localStorage
-    let savedNotes = JSON.parse(localStorage.getItem(`notes_${currentUser}`)) || [];
-    // FILTER OUT any non-strings
-    savedNotes = savedNotes.filter(note => typeof note === "string");
-    localStorage.setItem(`notes_${currentUser}`, JSON.stringify(savedNotes)); // optional cleanup
-    savedNotes.forEach(createNoteElement);
+  // 1. Load existing notes
+  let savedNotes = JSON.parse(localStorage.getItem(`notes_${currentUser}`)) || [];
 
-    // 2. Refresh notes on the page
+  // 2. Find index of the original note
+  const index = savedNotes.indexOf(currentlyViewedNote);
+  if (index !== -1) {
+    // 3. Replace with new version
+    savedNotes[index] = newText;
+
+    // 4. Save back to localStorage
+    localStorage.setItem(`notes_${currentUser}`, JSON.stringify(savedNotes));
+
+    // 5. Refresh notes on the page
     container.innerHTML = "";
     savedNotes.forEach(createNoteElement);
-    // 3. Reset and hide
-    currentlyViewedNote = null;
-    document.getElementById("fullNoteViewer").classList.add("hidden");
   }
-};
+
+  // 6. Clear and disable viewer, keep it visible
+currentlyViewedNote = null;
+
+const content = document.getElementById("fullNoteContent");
+content.value = "";
+content.disabled = true;
+content.placeholder = "Select the note First using ♣";
+}
+
+}
 
 function addNote() {
   const text = input.value.trim();
   if (!text) return;
 
-  // Save to localStorage
-  const savedNotes = JSON.parse(localStorage.getItem(`notes_${currentUser}`)) || [];
+  // Get the current list of notes for this user
+  let savedNotes = JSON.parse(localStorage.getItem(`notes_${currentUser}`)) || [];
+
+  // Add the new note
   savedNotes.push(text);
+
+  // Save the updated notes list back to localStorage
   localStorage.setItem(`notes_${currentUser}`, JSON.stringify(savedNotes));
 
+  // Create the visual note element
   createNoteElement(text);
+
+  // Clear the input box
   input.value = "";
 }
+
 
 function createNoteElement(text) {
   const div = document.createElement("div");
@@ -67,7 +87,10 @@ function createNoteElement(text) {
 
   div.appendChild(deleteBtn);
   container.appendChild(div);
+   
 }
+
+
 
 let currentlyViewedNote = null;
 
@@ -75,10 +98,49 @@ function viewNote(textToView) {
   const viewer = document.getElementById("fullNoteViewer");
   const content = document.getElementById("fullNoteContent");
 
+  content.disabled = false; // re-enable textarea
+  content.placeholder = ""; // clear placeholder
   content.value = textToView;
-  currentlyViewedNote = textToView; // ✅ This is what was missing
+  currentlyViewedNote = textToView;
   viewer.classList.remove("hidden");
 }
+
+function updateCenteredNote() {
+  const notes = document.querySelectorAll('.note');
+  const containerRect = container.getBoundingClientRect();
+  const containerCenterX = containerRect.left + containerRect.width / 2;
+
+  let closestNote = null;
+  let closestDistance = Infinity;
+
+  notes.forEach(note => {
+    const noteRect = note.getBoundingClientRect();
+    const noteCenterX = noteRect.left + noteRect.width / 2;
+    const distance = Math.abs(noteCenterX - containerCenterX);
+
+    if (distance < closestDistance) {
+      closestDistance = distance;
+      closestNote = note;
+    }
+  });
+
+  notes.forEach(note => {
+    if (note === closestNote) {
+      note.classList.add('enlarged');
+    } else {
+      note.classList.remove('enlarged');
+    }
+  });
+}
+
+// Run on scroll
+container.addEventListener('scroll', () => {
+  requestAnimationFrame(updateCenteredNote); // smooth + optimized
+});
+
+// Also run once after loading notes
+setTimeout(updateCenteredNote, 300);
+
 
 function deleteNote(textToRemove) {
   // Remove from notes
@@ -128,6 +190,8 @@ function viewTrash() {
 
 function restoreNote(text) {
   const notes = JSON.parse(localStorage.getItem(`notes_${currentUser}`)) || [];
+  restoreBtn.className = "restore-btn";
+  
   notes.push(text);
   localStorage.setItem(`notes_${currentUser}`, JSON.stringify(notes));
 
@@ -148,3 +212,4 @@ function cleanUpTrash() {
 function closeTrash() {
   document.getElementById("trashOverlay").classList.add("hidden");
 }
+

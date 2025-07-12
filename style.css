@@ -1,6 +1,6 @@
 body {
-  font-family: sans-serif;
-  background-color: #f0f4f8;
+   font-family: 'Red Hat Text', sans-serif;
+  background-color: rgba(244, 239, 235, 1);
   padding: 2em;
 }
 
@@ -11,17 +11,33 @@ body {
   font-family: inherit;
 }
 
+#noteInput::placeholder {
+  font-size: 1.7em; 
+  font-family: 'Poiret One', cursive;
+  font-style: italic;
+   text-align: center;
+    height: 200px;               /* fixed height to help with centering */
+  padding: 0;                  /* remove default padding */
+  line-height: 200px;          /* vertically center single-line text */
+  resize: none;
+}
 #notesContainer {
-  top: 85%;
   position: absolute;
+  top: 95%;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
-  flex-wrap: wrap;
-  gap: 1em;
-  padding-top: 2em;
-  justify-content: center;
+  flex-direction: row;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  gap: 3em; /* spacing between notes */
+  padding: 2em;
+  width: 90%;
+  box-sizing: border-box;
 }
 
-#addingBtn {
+
+#addingBtn, #saveViewerBtn {
   margin-top: 1em;
   padding: 0.5em 1em;
   background-color: #444;
@@ -32,7 +48,7 @@ body {
 
 #right-corner-text {
   position: absolute;
-  right: 20%;
+  right: 30%;
   transform: translate(55%, 0%);
 }
 
@@ -64,37 +80,81 @@ input, button {
 }
 
 .note {
-  background: #fff;
-  padding: 1em;
+  background-image: url("boxNotes.svg");
+  background-size: cover;
+  background-repeat: no-repeat;
   width: 15em;
   height: 10em;
-  margin: 1em;
-  border-left: 5px solid #007bff;
-  position: relative;
-  overflow: hidden;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  scroll-snap-align: start;
+  flex: 0 0 auto;
+  margin: 0; /* remove margin here, now handled by gap */
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
+transition: transform 0.3s ease;
+
+  padding-left: 2.5em;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.note.enlarged {
+  transform: scale(1.2) translateY(-10px);
+  z-index: 2;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  
+}
+
+
+#notesContainer::-webkit-scrollbar {
+  height: 0;
+}
+
+#notesContainer:hover::-webkit-scrollbar {
+  height: 8px;
+}
+
+#notesContainer::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 10px;
 }
 
 .delete-btn {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  background: red;
-  color: white;
+  top: 25px;
+  right: 15px;
+  background: #444;
+  color: #ffffff;
   border: none;
   padding: 0.2em 0.5em;
   cursor: pointer;
 }
+.restore-btn {
+  cursor: pointer;
+  background-color: #444;
+  padding: 0.2em 0.4em;
+  width: 2em;
+  bottom: 5px;
+  right: 5px;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 0.9em;
+  position: absolute;
+  text-align: center;
+  transition: background-color 0.2s ease;
+}
+
+
+.restore-btn:hover {
+  background-color: #666;
+}
 
 .view-btn {
   position: absolute;
-  top: 10px;
-  right: 30px;
-  background: purple;
+  top: 125px;
+  right: 20px;
+  background: #444;
   color: white;
   border: none;
   padding: 0.2em 0.5em;
@@ -105,7 +165,7 @@ input, button {
 #fullNoteViewer {
   position: absolute;
   top: 20%;
-  left: 80%;
+  left: 70%;
   transform: translate(-50%, 0%);
   display: flex;
   flex-direction: column;
@@ -116,6 +176,17 @@ input, button {
   border: 1px solid #ccc;
   border-radius: 10px;
   z-index: 10;
+}
+
+#fullNoteContent::placeholder {
+  font-size: 1.7em; 
+  font-family: 'Poiret One', cursive;
+  font-style: italic;
+   text-align: center;
+    height: 200px;               /* fixed height to help with centering */
+  padding: 0;                  /* remove default padding */
+  line-height: 200px;          /* vertically center single-line text */
+  resize: none;
 }
 
 #fullNoteContent {
@@ -132,6 +203,7 @@ input, button {
 .note p {
   font-size: 0.9em;
   line-height: 1.3em;
+  
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 4; /* Max 4 lines */
@@ -140,7 +212,7 @@ input, button {
 
 #viewTrashBtn {
   position: absolute;
-  background-color: #e0e6ec;
+  background-color: rgba(244, 239, 235, 1);
   color: white;
   border: none;
   padding: 0.5em 1em;
@@ -153,17 +225,18 @@ input, button {
 }
 
 #viewTrashBtn:hover {
-  background-color: #d32f2f;
+  
+  transform: scale(1.2);
 }
 
 #trashContainer {
-  background: white;
+  background: rgba(244, 239, 235, 1);
   padding: 2em;
   border-radius: 10px;
-  max-width: 90%;
-  max-height: 80vh;
-  overflow-y: auto;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    width: 60vw;               /* fixed width */
+  height: 60vh;              /* fixed height */
+  overflow-y: auto;          /* scroll vertically if content overflows */
   display: flex;
   flex-wrap: wrap;
   gap: 1em;
@@ -185,21 +258,47 @@ input, button {
 }
 
 .noteFromTrash {
-  background: #fff;
-  padding: 1em;
-  width: 10em;
-  height: 5em;
-  margin: 1em;
-  border-left: 5px solid #007bff;
+  background-image: url("boxNotes.svg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  width: 15em;           /* same as .note */
+  height: 10em;          /* same as .note */
+  margin: 0;             /* to match .note's margin 0 (spacing handled by gap) */
   position: relative;
   overflow: hidden;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
+  padding-left: 2.5em;   /* same as .note */
+  box-sizing: border-box;
+  align-items: flex-start;
 }
 
+.noteFromTrash p {
+  font-size: 0.9em;      /* same as .note p */
+  line-height: 1.3em;    /* same as .note p */
+  margin: 0;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 4; /* max 4 lines */
+  -webkit-box-orient: vertical;
+  padding-left: 0;       /* remove the extra 0.5em padding, handled by container */
+  position: relative
+}
+#closeTrashBtn {
+  position: absolute;
+  margin-top: 700px;
+  width: 150px;
+  height: 30px;
+  background-color: rgba(244, 239, 235, 1);
+  color: #444;
+  cursor: pointer;
+
+}
+
+#closeTrashBtn:hover {
+  transform: scale(1.2);
+}
 #authModal {
   position: fixed;
   top: 0;
@@ -207,7 +306,6 @@ input, button {
   width: 100%;
   height: 100%;
   backdrop-filter: blur(5px);
-  background: rgba(0, 0, 0, 0.4);
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -228,13 +326,35 @@ input, button {
 .auth-box input {
   margin: 0.5em 0;
   padding: 0.5em;
-  width: 15em;
+  width: 17em;
+  border: 1px solid #444;
+  border-radius: 7px;
+    background-color: #fdfdfd;
+ transition: border-color 0.3s ease;
+}
+.auth-box input:focus {
+  outline: none;
+  border-color: #444;
+  box-shadow: 0 0 10px #444;
 }
 
 .auth-buttons {
   display: flex;
   gap: 1em;
   margin-top: 1em;
+}
+.auth-buttons button {
+  padding: 0.5em 1em;
+  background-color: #444;
+  color: whitesmoke;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1em;
+  transition: background-color 0.3s ease;
+}
+.auth-buttons button:hover {
+  background-color: #666;
 }
 
 #loginStatus {

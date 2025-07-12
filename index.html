@@ -3,7 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <title>Persistent Notes App</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poiret+One&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Text&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="style.css" />
+
 </head>
 <body>
   <div id="authModal">
@@ -25,7 +29,7 @@
   </button>
 
   <div id="trashOverlay" class="hidden">
-    <button onclick="closeTrash()" style="margin-top: 1em;">Close</button>
+    <button onclick="closeTrash()" id="closeTrashBtn">Close</button>
     <div id="trashContainer"></div>
   </div>
 
@@ -38,8 +42,8 @@
   </div>
 
   <!-- Full-size note viewer -->
-  <div id="fullNoteViewer" class="hidden">
-    <textarea id="fullNoteContent"></textarea>
+  <div id="fullNoteViewer">
+    <textarea id="fullNoteContent" placeholder="Select the note First using ♣"></textarea>
     <button id="saveViewerBtn">Save</button>
   </div>
 
